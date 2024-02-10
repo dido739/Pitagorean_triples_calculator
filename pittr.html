@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagorean Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Добре дошли в калкулатор на питагорови тройки</h1>
+ 
+    <form id="pythagoreanForm">
+        <label>
+            <input type="radio" name="calculationType" value="1" checked>
+            Смятане по 2 катета:
+        </label>
+        <br>
+        <label for="katet1">Дължина на първи катет:</label>
+        <input type="number" id="katet1" name="katet1" value="3" required>
+        <br>
+        <label for="katet2">Дължина на втори катет:</label>
+        <input type="number" id="katet2" name="katet2" value="4" required>
+        <br>
+ 
+        <label>
+            <input type="radio" name="calculationType" value="2">
+            Смятане по катет и хипотенуза:
+        </label>
+        <br>
+        <label for="katetHipotenusa">Дължина на първи катет:</label>
+        <input type="number" id="katetHipotenusa" name="katetHipotenusa" value = "3" required>
+        <br>
+        <label for="hipotenusa">Дължина на хипотенуза:</label>
+        <input type="number" id="hipotenusa" name="hipotenusa" value="5" required>
+        <br>
+ 
+        <button type="button" onclick="calculatePythagoreanTriple()">Изчисли</button>
+    </form>
+ 
+    <div id="result"></div>
+ 
+    <canvas id="turtleCanvas" width="1920" height="1080"></canvas>
+ 
+    <script>
+        function calculatePythagoreanTriple() {
+            var form = document.getElementById("pythagoreanForm");
+            var resultDiv = document.getElementById("result");
+            var canvas = document.getElementById("turtleCanvas");
+            var context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+ 
+            var katet1, katet2, hipotenusa;
+ 
+            if (form.elements["calculationType"].value === "1") {
+                katet1 = parseFloat(form.elements["katet1"].value);
+                katet2 = parseFloat(form.elements["katet2"].value);
+                hipotenusa = Math.sqrt(katet2**2 + katet1**2);
+                resultDiv.innerHTML = 'Хипотенузата е: ' + hipotenusa;
+            } else {
+                katet1 = parseFloat(form.elements["katetHipotenusa"].value);
+                hipotenusa = parseFloat(form.elements["hipotenusa"].value);
+                katet2 = Math.sqrt(hipotenusa**2 - katet1**2);
+                resultDiv.innerHTML = 'Другият катет е: ' + katet2;
+            }
+ 
+            var lice = katet1 * katet2 / 2;
+            var obikolka = katet1 + katet2 + hipotenusa;
+ 
+            resultDiv.innerHTML += '<br>Лицето е: ' + lice;
+            resultDiv.innerHTML += '<br>Обиколката е: ' + obikolka;
+ 
+            // Изчертаване с turtle
+            var pitagor = new Turtle(context);
+            pitagor.drawTriangle(katet1, katet2, hipotenusa);
+        }
+ 
+        // Клас за Turtle
+        class Turtle {
+            constructor(context) {
+                this.context = context;
+                this.x = 50;
+                this.y = 980;
+                this.angle = 0;
+                this.penDown = true;
+            }
+ 
+            moveTo(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+ 
+            lineTo(x, y) {
+                if (this.penDown) {
+                    this.context.beginPath();
+                    this.context.moveTo(this.x, this.y);
+                    this.context.lineTo(x, y);
+                    this.context.stroke();
+                }
+ 
+                this.x = x;
+                this.y = y;
+            }
+ 
+            setHeading(angle) {
+                this.angle = angle;
+            }
+ 
+            forward(distance) {
+                const radians = (this.angle * Math.PI) / 180;
+                const newX = this.x + distance * Math.cos(radians);
+                const newY = this.y - distance * Math.sin(radians);
+ 
+                this.lineTo(newX, newY);
+            }
+ 
+            drawTriangle(a, b, c) {
+                const angleA = Math.atan(b / a) * (180 / Math.PI);
+                const angleB = 90 - angleA;
+                const angleC = 90;
+                const heading = 0;
+                //this.moveTo(a*100+x,y);
+                //this.setHeading(180);
+                this.forward(a*50);
+                this.setHeading(90);
+                this.forward(b*50);
+                this.setHeading(270-angleB);
+                this.forward(c*50);
+            }
+        }
+    </script>
+</body>
+</html>
